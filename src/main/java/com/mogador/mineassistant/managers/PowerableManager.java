@@ -14,16 +14,17 @@ import com.mogador.mineassistant.enums.HomeEntityStatus;
 
 public class PowerableManager {
 
+    // Singleton
     private static PowerableManager instance;
-
-    private Dictionary<HomeEntity, List<Block>> powerableDict;
-    
     public static PowerableManager getInstance() {
         if (instance == null) {
             instance = new PowerableManager();
         }
         return instance;
     }
+    private PowerableManager() {}
+
+    private Dictionary<HomeEntity, List<Block>> powerableDict;
     
     public void initialize() {
         this.powerableDict = new Hashtable<HomeEntity, List<Block>>();
