@@ -1,0 +1,58 @@
+package com.mogador.mineassistant.managers;
+
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+
+import org.bukkit.block.Block;
+import org.bukkit.block.data.Powerable;
+
+import com.mogador.mineassistant.enums.HomeEntity;
+import com.mogador.mineassistant.enums.HomeEntityStatus;
+
+public class PowerableManager {
+
+    private static PowerableManager instance;
+
+    private Dictionary<HomeEntity, List<Block>> powerableDict;
+    
+    public static PowerableManager getInstance() {
+        if (instance == null) {
+            instance = new PowerableManager();
+        }
+        return instance;
+    }
+    
+    public void initialize() {
+        this.powerableDict = new Hashtable<HomeEntity, List<Block>>();
+    }
+
+    public void updateStatus(HomeEntity entity, HomeEntityStatus status) {
+        Iterator<Block> iterator = this.getPowerableList(entity).iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            if(block.getBlockData() instanceof Powerable powerable) {
+                boolean statusBoolean = status.toBoolean();
+                if(powerable.isPowered() ^ statusBoolean) { // Do not update if status doesn't change (^ => XOR)
+                    powerable.setPowered(statusBoolean);
+                    block.setBlockData(powerable);
+                }
+            } else {
+                iterator.remove();
+            }
+        }
+    }
+
+    public List<Block> getPowerableList(HomeEntity entity) {
+        List<Block> powerableList = this.powerableDict.get(entity);
+        if (powerableList != null) {
+            return powerableList;
+        }
+
+        this.powerableDict.put(entity, new ArrayList<>());
+        return this.powerableDict.get(entity);
+    }
+    
+}

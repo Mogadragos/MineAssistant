@@ -1,0 +1,5 @@
+main: com.mogador.mineassistant.MineAssistant
+version: 1.0.0-SNAPSHOT
+name: MineAssistant
+author: Alice Caillaud
+api-version: 1.13
