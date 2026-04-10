@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
 
@@ -24,16 +25,19 @@ public class PowerableManager {
     }
     private PowerableManager() {}
 
-    private Dictionary<HomeEntity, List<Block>> powerableDict;
+    private Dictionary<HomeEntity, List<Location>> powerableDict;
     
     public void initialize() {
-        this.powerableDict = new Hashtable<HomeEntity, List<Block>>();
+        this.powerableDict = new Hashtable<HomeEntity, List<Location>>();
     }
 
     public void updateStatus(HomeEntity entity, HomeEntityStatus status) {
-        Iterator<Block> iterator = this.getPowerableList(entity).iterator();
+        Iterator<Location> iterator = this.getPowerableList(entity).iterator();
+        
         while (iterator.hasNext()) {
-            Block block = iterator.next();
+            Location loc = iterator.next();
+            Block block = loc.getBlock();
+
             if(block.getBlockData() instanceof Powerable powerable) {
                 boolean statusBoolean = status.toBoolean();
                 if(powerable.isPowered() ^ statusBoolean) { // Do not update if status doesn't change (^ => XOR)
@@ -46,8 +50,8 @@ public class PowerableManager {
         }
     }
 
-    public List<Block> getPowerableList(HomeEntity entity) {
-        List<Block> powerableList = this.powerableDict.get(entity);
+    public List<Location> getPowerableList(HomeEntity entity) {
+        List<Location> powerableList = this.powerableDict.get(entity);
         if (powerableList != null) {
             return powerableList;
         }
