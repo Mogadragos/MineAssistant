@@ -13,7 +13,7 @@ public class MineAssistant extends JavaPlugin {
     public void onEnable() {
         
         // Initialize managers
-        PersistenceManager.getInstance().initialize(this);
+        PersistenceManager.getInstance().initialize(this, "powerable.yml");
         PowerableManager.getInstance().initialize();
         MqttManager.getInstance().initialize(this);
         

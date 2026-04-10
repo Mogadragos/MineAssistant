@@ -5,8 +5,7 @@ import java.io.IOException;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import com.mogador.mineassistant.MineAssistant;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class PersistenceManager {
 
@@ -20,12 +19,14 @@ public class PersistenceManager {
     }
     private PersistenceManager() {}
 
-    private MineAssistant plugin;
-    private File syncPowerableFile;
-    private FileConfiguration syncPowerableConfig;
+    private JavaPlugin plugin;
+    private String fileName;
+    private File persistenceFile;
+    private FileConfiguration persistenceConfig;
 
-    public void initialize(MineAssistant plugin) {
+    public void initialize(JavaPlugin plugin, String fileName) {
         this.plugin = plugin;
+        this.fileName = fileName;
 
         load();
     }
@@ -35,29 +36,29 @@ public class PersistenceManager {
             plugin.getDataFolder().mkdirs();
         }
 
-        syncPowerableFile = new File(plugin.getDataFolder(), "levers.yml");
+        persistenceFile = new File(plugin.getDataFolder(), fileName);
 
-        if (!syncPowerableFile.exists()) {
+        if (!persistenceFile.exists()) {
             try {
-                syncPowerableFile.createNewFile();
+                persistenceFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        syncPowerableConfig = YamlConfiguration.loadConfiguration(syncPowerableFile);
-    }
-
-    public void persist() {
-        try {
-            syncPowerableConfig.save(syncPowerableFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        persistenceConfig = YamlConfiguration.loadConfiguration(persistenceFile);
     }
 
     public FileConfiguration getData() {
-        return syncPowerableConfig;
+        return persistenceConfig;
+    }
+
+    public void save() {
+        try {
+            persistenceConfig.save(persistenceFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

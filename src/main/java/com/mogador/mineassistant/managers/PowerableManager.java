@@ -2,9 +2,11 @@ package com.mogador.mineassistant.managers;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -25,15 +27,28 @@ public class PowerableManager {
     }
     private PowerableManager() {}
 
-    private Dictionary<HomeEntity, List<Location>> powerableDict;
+    private Dictionary<HomeEntity, Set<Location>> powerableDict;
     
     public void initialize() {
-        this.powerableDict = new Hashtable<HomeEntity, List<Location>>();
+        this.powerableDict = new Hashtable<HomeEntity, Set<Location>>();
+
+        for(HomeEntity entity : HomeEntity.values()) {
+            List<?> list = PersistenceManager.getInstance().getData().getList(entity.toString());
+            if(list != null) {
+                Set<Location> powerableSet = getPowerableSet(entity);
+                for (Object obj : list) {
+                    if (obj instanceof Location loc) {
+                        powerableSet.add(loc);
+                    }
+                }
+            }
+        }
     }
 
     public void updateStatus(HomeEntity entity, HomeEntityStatus status) {
-        Iterator<Location> iterator = this.getPowerableList(entity).iterator();
-        
+        boolean edited = false;
+        Iterator<Location> iterator = getPowerableSet(entity).iterator();
+
         while (iterator.hasNext()) {
             Location loc = iterator.next();
             Block block = loc.getBlock();
@@ -45,19 +60,34 @@ public class PowerableManager {
                     block.setBlockData(powerable);
                 }
             } else {
+                edited = true;
                 iterator.remove();
             }
         }
+
+        if(edited) {
+            persist(entity);
+        }
     }
 
-    public List<Location> getPowerableList(HomeEntity entity) {
-        List<Location> powerableList = this.powerableDict.get(entity);
-        if (powerableList != null) {
-            return powerableList;
+    public void add(HomeEntity entity, Location loc) {
+        getPowerableSet(entity).add(loc);
+        persist(entity);
+    }
+
+    private Set<Location> getPowerableSet(HomeEntity entity) {
+        Set<Location> powerableSet = powerableDict.get(entity);
+        if (powerableSet != null) {
+            return powerableSet;
         }
 
-        this.powerableDict.put(entity, new ArrayList<>());
-        return this.powerableDict.get(entity);
+        powerableDict.put(entity, new HashSet<>());
+        return powerableDict.get(entity);
+    }
+
+    private void persist(HomeEntity entity) {
+        PersistenceManager.getInstance().getData().set(entity.toString(), new ArrayList<>(getPowerableSet(entity)));
+        PersistenceManager.getInstance().save();
     }
     
 }
