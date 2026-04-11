@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.mogador.mineassistant.listeners.StatusChangeListener;
 import com.mogador.mineassistant.managers.PowerableManager;
 import com.mogador.mineassistant.managers.MqttManager;
+import com.mogador.mineassistant.managers.PersistenceManager;
 
 public class MineAssistant extends JavaPlugin {
     
@@ -12,6 +13,7 @@ public class MineAssistant extends JavaPlugin {
     public void onEnable() {
         
         // Initialize managers
+        PersistenceManager.getInstance().initialize(this, "powerable.yml");
         PowerableManager.getInstance().initialize();
         MqttManager.getInstance().initialize(this);
         

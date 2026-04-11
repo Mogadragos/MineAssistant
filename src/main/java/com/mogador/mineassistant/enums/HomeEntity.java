@@ -7,7 +7,7 @@ public enum HomeEntity {
   BUREAU("light.buro"),
   CHAMBRE("light.chambre");
 
-  public final String label;
+  private final String label;
 
   public String getLabel() {
     return label;

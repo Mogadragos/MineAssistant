@@ -6,7 +6,7 @@ public enum HomeEntityStatus {
   ON("on"),
   OFF("off");
 
-  public final String label;
+  private final String label;
 
   public String getLabel() {
     return label;

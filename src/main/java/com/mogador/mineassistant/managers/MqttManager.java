@@ -14,7 +14,15 @@ import com.mogador.mineassistant.constants.JsonConstants;
 
 public class MqttManager {
 
+    // Singleton
     private static MqttManager instance;
+    public static MqttManager getInstance() {
+        if (instance == null) {
+            instance = new MqttManager();
+        }
+        return instance;
+    }
+    private MqttManager() {}
 
     private final String BROKER = "tcp://localhost:1883";
     private final String CLIENT_ID = "MinecraftServer";
@@ -22,13 +30,6 @@ public class MqttManager {
     private final int QOS = 0;
 
     private MqttClient client;
-
-    public static MqttManager getInstance() {
-        if (instance == null) {
-            instance = new MqttManager();
-        }
-        return instance;
-    }
 
     public void initialize(MineAssistant plugin) {
 
