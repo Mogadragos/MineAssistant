@@ -58,7 +58,7 @@ public class PowerableManager {
             Block block = loc.getBlock();
 
             if(block.getBlockData() instanceof Powerable powerable) {
-                boolean desired = status.toBoolean();
+                boolean desired = status.isOn();
                 if(powerable.isPowered() != desired) {
                     powerable.setPowered(desired);
                     block.setBlockData(powerable);

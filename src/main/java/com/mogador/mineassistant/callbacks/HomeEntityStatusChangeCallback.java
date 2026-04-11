@@ -17,7 +17,7 @@ import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
 
 public class HomeEntityStatusChangeCallback implements MqttCallback {
 
-    private JavaPlugin plugin;
+    private final JavaPlugin plugin;
 
     public HomeEntityStatusChangeCallback(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -53,7 +53,7 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-        plugin.getLogger().info("Delivery complete...");
+        // Do nothing
     }
     
 }

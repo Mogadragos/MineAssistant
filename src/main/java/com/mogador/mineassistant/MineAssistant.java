@@ -21,7 +21,7 @@ public class MineAssistant extends JavaPlugin {
         MqttManager.getInstance().initialize(this);
         
         // Register listeners
-        getServer().getPluginManager().registerEvents(new StatusChangeListener(), this);
+        getServer().getPluginManager().registerEvents(new StatusChangeListener(this), this);
         
         getLogger().info("MineAssistant has been enabled!");
     }
