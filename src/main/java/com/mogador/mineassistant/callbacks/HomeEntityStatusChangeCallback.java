@@ -33,8 +33,8 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
         byte[] payload = message.getPayload();
         try {
             JSONObject json = new JSONObject(new String(payload, StandardCharsets.UTF_8));
-            plugin.getLogger().info("Message received");
             if(!JsonConstants.VALUE_SOURCE_MINECRAFT.equals(json.optString(JsonConstants.KEY_SOURCE))) {
+                plugin.getLogger().info("Message received");
                 HomeEntity entity = HomeEntity.valueOfLabel(json.getString(JsonConstants.KEY_HOME_ENTITY));
                 HomeEntityStatus status = HomeEntityStatus.valueOfLabel(json.getString(JsonConstants.KEY_HOME_ENTITY_STATUS));
 
@@ -44,6 +44,8 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
                         new HomeEntityStatusChangeEvent(entity, status)
                     )
                 );
+            } else {
+                plugin.getLogger().info("Message received; from minecraft: ignored");
             }
         } catch(JSONException e) {
             String payloadPreview = new String(payload, 0, Math.min(100, payload.length));
