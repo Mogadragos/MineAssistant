@@ -56,6 +56,7 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
         // Do nothing
+        // DM user result
     }
     
 }
