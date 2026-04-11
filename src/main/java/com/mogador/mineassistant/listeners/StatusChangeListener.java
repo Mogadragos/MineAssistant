@@ -20,7 +20,7 @@ public class StatusChangeListener implements Listener {
         if(!event.isCancelled() && event.getBlockPlaced().getType() == Material.LEVER) {
             PowerableManager.getInstance().add(HomeEntity.SALON, event.getBlockPlaced().getLocation());
 
-            Utils.publishToggleLight(HomeEntity.SALON, HomeEntityStatus.ON);
+            Utils.publishLightChange(HomeEntity.SALON, HomeEntityStatus.ON);
         }
     }
 

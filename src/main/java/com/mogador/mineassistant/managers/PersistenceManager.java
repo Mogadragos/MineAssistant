@@ -2,6 +2,7 @@ package com.mogador.mineassistant.managers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,28 +11,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PersistenceManager {
 
     // Singleton
-    private static PersistenceManager instance;
+    private static final PersistenceManager instance = new PersistenceManager();
     public static PersistenceManager getInstance() {
-        if (instance == null) {
-            instance = new PersistenceManager();
-        }
         return instance;
     }
     private PersistenceManager() {}
 
     private JavaPlugin plugin;
-    private String fileName;
     private File persistenceFile;
-    private FileConfiguration persistenceConfig;
+    private FileConfiguration config;
 
     public void initialize(JavaPlugin plugin, String fileName) {
         this.plugin = plugin;
-        this.fileName = fileName;
 
-        load();
-    }
-
-    public void load() {
         if (!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdirs();
         }
@@ -42,22 +34,32 @@ public class PersistenceManager {
             try {
                 persistenceFile.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                plugin.getLogger().severe("Could not create persistence file: " + e.getMessage());
+                return;
             }
         }
 
-        persistenceConfig = YamlConfiguration.loadConfiguration(persistenceFile);
+        config = YamlConfiguration.loadConfiguration(persistenceFile);
     }
 
-    public FileConfiguration getData() {
-        return persistenceConfig;
+    public FileConfiguration getConfig() {
+        return config;
+    }
+
+    public List<?> getList(String key) {
+        return config.getList(key);
+    }
+
+    public void setList(String key, List<?> list) {
+        config.set(key, list);
+        save();
     }
 
     public void save() {
         try {
-            persistenceConfig.save(persistenceFile);
+            config.save(persistenceFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Could not save persistence file: " + e.getMessage());
         }
     }
 

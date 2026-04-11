@@ -1,0 +1,9 @@
+# MQTT settings
+mqtt:
+  broker: "tcp://localhost:1883"
+  client_id: "MinecraftServer"
+  topic: "homeassistant/light/state"
+  qos: 0
+  connect_timeout: 30        # seconds
+  automatic_reconnect: true
+  clean_session: true

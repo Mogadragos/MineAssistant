@@ -1,16 +1,18 @@
 package com.mogador.mineassistant.managers;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
@@ -18,27 +20,29 @@ import com.mogador.mineassistant.enums.HomeEntityStatus;
 public class PowerableManager {
 
     // Singleton
-    private static PowerableManager instance;
+    private static final PowerableManager instance = new PowerableManager();
     public static PowerableManager getInstance() {
-        if (instance == null) {
-            instance = new PowerableManager();
-        }
         return instance;
     }
     private PowerableManager() {}
 
-    private Dictionary<HomeEntity, Set<Location>> powerableDict;
+    private JavaPlugin plugin;
+    private final Map<HomeEntity, Set<Location>> powerableMap = new HashMap<>();
     
-    public void initialize() {
-        this.powerableDict = new Hashtable<HomeEntity, Set<Location>>();
+    public void initialize(JavaPlugin plugin) {
+        this.plugin = plugin;
 
         for(HomeEntity entity : HomeEntity.values()) {
-            List<?> list = PersistenceManager.getInstance().getData().getList(entity.toString());
-            if(list != null) {
-                Set<Location> powerableSet = getPowerableSet(entity);
-                for (Object obj : list) {
+
+            List<?> rawList = PersistenceManager.getInstance().getList(entity.name());
+
+            if(rawList != null) {
+                Set<Location> locations = getLocations(entity);
+                for (Object obj : rawList) {
                     if (obj instanceof Location loc) {
-                        powerableSet.add(loc);
+                        locations.add(loc);
+                    } else {
+                        plugin.getLogger().log(Level.WARNING, "Invalid entry for {0}: {1}", new Object[]{entity.name(), obj.getClass().getName()});
                     }
                 }
             }
@@ -46,48 +50,54 @@ public class PowerableManager {
     }
 
     public void updateStatus(HomeEntity entity, HomeEntityStatus status) {
-        boolean edited = false;
-        Iterator<Location> iterator = getPowerableSet(entity).iterator();
+        boolean updatedInvalid = false;
+        Iterator<Location> iterator = getLocations(entity).iterator();
 
         while (iterator.hasNext()) {
             Location loc = iterator.next();
             Block block = loc.getBlock();
 
             if(block.getBlockData() instanceof Powerable powerable) {
-                boolean statusBoolean = status.toBoolean();
-                if(powerable.isPowered() ^ statusBoolean) { // Do not update if status doesn't change (^ => XOR)
-                    powerable.setPowered(statusBoolean);
+                boolean desired = status.toBoolean();
+                if(powerable.isPowered() != desired) {
+                    powerable.setPowered(desired);
                     block.setBlockData(powerable);
                 }
             } else {
-                edited = true;
+                updatedInvalid = true;
                 iterator.remove();
             }
         }
 
-        if(edited) {
+        if(updatedInvalid) {
             persist(entity);
         }
     }
 
     public void add(HomeEntity entity, Location loc) {
-        getPowerableSet(entity).add(loc);
-        persist(entity);
+        if(getLocations(entity).add(loc)) {
+            plugin.getLogger().log(Level.FINEST, "Added new lever for {0}: {1}", new Object[]{entity.name(), loc});
+            persist(entity);
+        } else {
+            plugin.getLogger().log(Level.FINEST, "Duplicate lever ignored for {0}: {1}", new Object[]{entity.name(), loc});
+        }
     }
 
-    private Set<Location> getPowerableSet(HomeEntity entity) {
-        Set<Location> powerableSet = powerableDict.get(entity);
-        if (powerableSet != null) {
-            return powerableSet;
+    public void remove(HomeEntity entity, Location loc) {
+        if(getLocations(entity).remove(loc)) {
+            plugin.getLogger().log(Level.FINEST, "Removed lever for {0}: {1}", new Object[]{entity.name(), loc});
+            persist(entity);
+        } else {
+            plugin.getLogger().log(Level.FINEST, "Inexistant lever ignored for {0}: {1}", new Object[]{entity.name(), loc});
         }
+    }
 
-        powerableDict.put(entity, new HashSet<>());
-        return powerableDict.get(entity);
+    private Set<Location> getLocations(HomeEntity entity) {
+        return powerableMap.computeIfAbsent(entity, k -> new HashSet<>());
     }
 
     private void persist(HomeEntity entity) {
-        PersistenceManager.getInstance().getData().set(entity.toString(), new ArrayList<>(getPowerableSet(entity)));
-        PersistenceManager.getInstance().save();
+        PersistenceManager.getInstance().setList(entity.name(), new ArrayList<>(getLocations(entity)));
     }
     
 }

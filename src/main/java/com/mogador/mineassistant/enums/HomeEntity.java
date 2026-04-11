@@ -1,14 +1,15 @@
 package com.mogador.mineassistant.enums;
 
-import java.util.Arrays;
+import com.mogador.mineassistant.utils.EnumLabelUtils;
 
-public enum HomeEntity {
+public enum HomeEntity implements EnumLabel {
   SALON("light.salon"),
   BUREAU("light.buro"),
   CHAMBRE("light.chambre");
 
   private final String label;
 
+  @Override
   public String getLabel() {
     return label;
   }
@@ -18,9 +19,6 @@ public enum HomeEntity {
   }
 
   public static HomeEntity valueOfLabel(String label) {
-    return Arrays.stream(HomeEntity.values())
-        .filter(entity -> entity.getLabel().equals(label))
-        .findAny()
-        .orElseThrow();
+    return EnumLabelUtils.valueOfLabel(HomeEntity.class, label);
   }
 }
