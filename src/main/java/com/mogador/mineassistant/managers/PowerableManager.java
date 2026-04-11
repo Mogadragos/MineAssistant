@@ -44,7 +44,7 @@ public class PowerableManager {
                     } else {
                         plugin.getLogger().log(Level.WARNING, "Invalid entry for {0}: {1}", new Object[]{entity.name(), obj.getClass().getName()});
                     }
-                }
+                }    
             }
         }
     }
@@ -69,27 +69,25 @@ public class PowerableManager {
             }
         }
 
-        if(updatedInvalid) {
-            persist(entity);
-        }
+        if(updatedInvalid) persist(entity);
+    }
+
+    private void editLoc(HomeEntity entity, Location loc, boolean add) {
+        boolean success = add ? getLocations(entity).add(loc) : getLocations(entity).remove(loc);
+        String actionWord = add ? "Added" : "Removed";
+        
+        plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, existing: {3}", 
+            new Object[]{actionWord, entity.name(), loc, success});
+        
+        if(success) persist(entity);
     }
 
     public void add(HomeEntity entity, Location loc) {
-        if(getLocations(entity).add(loc)) {
-            plugin.getLogger().log(Level.FINEST, "Added new lever for {0}: {1}", new Object[]{entity.name(), loc});
-            persist(entity);
-        } else {
-            plugin.getLogger().log(Level.FINEST, "Duplicate lever ignored for {0}: {1}", new Object[]{entity.name(), loc});
-        }
+        editLoc(entity, loc, true);
     }
 
     public void remove(HomeEntity entity, Location loc) {
-        if(getLocations(entity).remove(loc)) {
-            plugin.getLogger().log(Level.FINEST, "Removed lever for {0}: {1}", new Object[]{entity.name(), loc});
-            persist(entity);
-        } else {
-            plugin.getLogger().log(Level.FINEST, "Inexistant lever ignored for {0}: {1}", new Object[]{entity.name(), loc});
-        }
+        editLoc(entity, loc, false);
     }
 
     private Set<Location> getLocations(HomeEntity entity) {
