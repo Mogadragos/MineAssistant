@@ -7,10 +7,7 @@ public final class JsonConstants {
     public static final String KEY_SOURCE = "source";
 
     // Constant values
-    public static final String SOURCE_MINECRAFT = "minecraft";
-
-    // Misc
-    public static final String CHARSET = "utf-8";
+    public static final String VALUE_SOURCE_MINECRAFT = "minecraft";
 
     private JsonConstants() {}
 

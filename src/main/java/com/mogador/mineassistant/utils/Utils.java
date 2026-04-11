@@ -9,19 +9,19 @@ import com.mogador.mineassistant.managers.MqttManager;
 
 public class Utils {
 
-    public static String prepareContentString(HomeEntity entity, HomeEntityStatus status) {
+    public static String prepareLightPayload(HomeEntity entity, HomeEntityStatus status) {
 
         JSONObject json = new JSONObject();
         json.put(JsonConstants.KEY_HOME_ENTITY, entity.getLabel());
         json.put(JsonConstants.KEY_HOME_ENTITY_STATUS, status.getLabel());
-        json.put(JsonConstants.KEY_SOURCE, JsonConstants.SOURCE_MINECRAFT);
+        json.put(JsonConstants.KEY_SOURCE, JsonConstants.VALUE_SOURCE_MINECRAFT);
         return json.toString();
 
     }
 
-    public static void publishToggleLight(HomeEntity entity, HomeEntityStatus status) {
+    public static void publishLightChange(HomeEntity entity, HomeEntityStatus status) {
 
-        String content  = prepareContentString(entity, status);
+        String content = prepareLightPayload(entity, status);
         MqttManager.getInstance().publish(content);
 
     }

@@ -11,10 +11,13 @@ public class MineAssistant extends JavaPlugin {
     
     @Override
     public void onEnable() {
-        
+        // Load config and ensure defaults are written
+        saveDefaultConfig();  // creates config.yml from resources if missing
+        getLogger().info("Loaded config.yml");
+
         // Initialize managers
         PersistenceManager.getInstance().initialize(this, "powerable.yml");
-        PowerableManager.getInstance().initialize();
+        PowerableManager.getInstance().initialize(this);
         MqttManager.getInstance().initialize(this);
         
         // Register listeners

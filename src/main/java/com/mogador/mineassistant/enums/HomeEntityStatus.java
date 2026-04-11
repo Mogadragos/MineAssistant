@@ -1,19 +1,20 @@
 package com.mogador.mineassistant.enums;
 
-import java.util.Arrays;
+import com.mogador.mineassistant.utils.EnumLabelUtils;
 
-public enum HomeEntityStatus {
+public enum HomeEntityStatus implements EnumLabel {
   ON("on"),
   OFF("off");
 
   private final String label;
 
+  @Override
   public String getLabel() {
     return label;
   }
 
   public boolean toBoolean() {
-    return HomeEntityStatus.ON.equals(this);
+    return ON.equals(this);
   }
 
   HomeEntityStatus(String value) {
@@ -21,9 +22,6 @@ public enum HomeEntityStatus {
   }
 
   public static HomeEntityStatus valueOfLabel(String label) {
-    return Arrays.stream(HomeEntityStatus.values())
-        .filter(entity -> entity.getLabel().equals(label))
-        .findAny()
-        .orElseThrow();
+    return EnumLabelUtils.valueOfLabel(HomeEntityStatus.class, label);
   }
 }
