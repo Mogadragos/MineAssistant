@@ -61,7 +61,7 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
     public void deliveryComplete(IMqttDeliveryToken token) {
         LogData logData = Optional.ofNullable(token.getException())
                             .map(e -> new LogData(Level.WARNING, "Error delivering message : " + e.getMessage(), e))
-                            .orElse(new LogData(Level.INFO, "Message delivered !", null));
+                            .orElse(new LogData(Level.FINEST, "Message delivered !", null));
 
         if(token.getUserContext() instanceof Player player) {
             player.sendMessage(logData.getMessage());
