@@ -37,6 +37,6 @@ public class HomeEntityStatusChangeEvent extends Event {
 
     @Override
     public String toString() {
-        return "HomeEntityStatusChangeEvent{entity=" + entity.getLabel() + ", status=" + status.getLabel() + '}';
+        return "HomeEntityStatusChangeEvent{entity=" + entity.name() + ", status=" + status.name() + '}';
     }
 }
