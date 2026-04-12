@@ -1,30 +1,22 @@
 package com.mogador.mineassistant.enums;
 
-import com.mogador.mineassistant.utils.EnumLabelUtils;
+import com.google.gson.annotations.SerializedName;
 
-public enum HomeEntityStatus implements EnumLabel {
-  ON("on", true),
-  OFF("off", false);
+public enum HomeEntityStatus {
+  @SerializedName("on")
+  ON(true),
 
-  private final String label;
+  @SerializedName("off")
+  OFF(false);
+
   private final boolean isOn;
 
-  @Override
-  public String getLabel() {
-    return label;
+  HomeEntityStatus(boolean isOn) {
+    this.isOn = isOn;
   }
 
   public boolean isOn() {
     return isOn;
-  }
-
-  HomeEntityStatus(String label, boolean isOn) {
-    this.label = label;
-    this.isOn = isOn;
-  }
-
-  public static HomeEntityStatus valueOfLabel(String label) {
-    return EnumLabelUtils.valueOfLabel(HomeEntityStatus.class, label);
   }
 
   public static HomeEntityStatus valueOf(boolean isOn) {

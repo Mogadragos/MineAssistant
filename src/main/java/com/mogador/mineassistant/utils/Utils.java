@@ -3,7 +3,7 @@ package com.mogador.mineassistant.utils;
 import org.bukkit.entity.Player;
 
 import com.google.gson.Gson;
-import com.mogador.mineassistant.data.MqttPayloadData;
+import com.mogador.mineassistant.data.HomeEntityChangeData;
 import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 import com.mogador.mineassistant.managers.MqttManager;
@@ -12,7 +12,7 @@ public class Utils {
 
     public static String prepareLightPayload(HomeEntity entity, HomeEntityStatus status) {
 
-        MqttPayloadData data = new MqttPayloadData(entity.getLabel(), status.getLabel());
+        HomeEntityChangeData data = new HomeEntityChangeData(entity, status);
         Gson gson = new Gson();
         return gson.toJson(data);
 

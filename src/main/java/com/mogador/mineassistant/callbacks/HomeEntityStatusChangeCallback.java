@@ -15,9 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.mogador.mineassistant.constants.JsonConstants;
 import com.mogador.mineassistant.data.LogData;
-import com.mogador.mineassistant.data.MqttPayloadData;
-import com.mogador.mineassistant.enums.HomeEntity;
-import com.mogador.mineassistant.enums.HomeEntityStatus;
+import com.mogador.mineassistant.data.HomeEntityChangeData;
 import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
 
 public class HomeEntityStatusChangeCallback implements MqttCallback {
@@ -38,16 +36,14 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
         byte[] payload = message.getPayload();
         try {
             Gson gson = new Gson();
-            MqttPayloadData data = gson.fromJson(new String(payload, StandardCharsets.UTF_8), MqttPayloadData.class);
-            if(!JsonConstants.VALUE_SOURCE_MINECRAFT.equals(data.getSource())) {
+            HomeEntityChangeData data = gson.fromJson(new String(payload, StandardCharsets.UTF_8), HomeEntityChangeData.class);
+            if(!JsonConstants.SOURCE_MINECRAFT.equals(data.getSource())) {
                 plugin.getLogger().info("Message received");
-                HomeEntity entity = HomeEntity.valueOfLabel(data.getEntityId());
-                HomeEntityStatus status = HomeEntityStatus.valueOfLabel(data.getStatus());
 
                 Bukkit.getScheduler().runTask(
                     plugin,
                     () -> Bukkit.getPluginManager().callEvent(
-                        new HomeEntityStatusChangeEvent(entity, status)
+                        new HomeEntityStatusChangeEvent(data.getEntity(), data.getStatus())
                     )
                 );
             } else {

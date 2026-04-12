@@ -1,24 +1,14 @@
 package com.mogador.mineassistant.enums;
 
-import com.mogador.mineassistant.utils.EnumLabelUtils;
+import com.google.gson.annotations.SerializedName;
 
-public enum HomeEntity implements EnumLabel {
-  SALON("light.salon"),
-  BUREAU("light.buro"),
-  CHAMBRE("light.chambre");
+public enum HomeEntity {
+  @SerializedName("light.salon")
+  SALON,
 
-  private final String label;
+  @SerializedName("light.buro")
+  BUREAU,
 
-  @Override
-  public String getLabel() {
-    return label;
-  }
-
-  HomeEntity(String value) {
-    this.label = value;
-  }
-
-  public static HomeEntity valueOfLabel(String label) {
-    return EnumLabelUtils.valueOfLabel(HomeEntity.class, label);
-  }
+  @SerializedName("light.chambre")
+  CHAMBRE;
 }
