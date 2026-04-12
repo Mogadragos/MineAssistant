@@ -1,9 +1,9 @@
 package com.mogador.mineassistant.utils;
 
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
 
-import com.mogador.mineassistant.constants.JsonConstants;
+import com.google.gson.Gson;
+import com.mogador.mineassistant.data.MqttPayloadData;
 import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 import com.mogador.mineassistant.managers.MqttManager;
@@ -12,11 +12,9 @@ public class Utils {
 
     public static String prepareLightPayload(HomeEntity entity, HomeEntityStatus status) {
 
-        JSONObject json = new JSONObject();
-        json.put(JsonConstants.KEY_HOME_ENTITY, entity.getLabel());
-        json.put(JsonConstants.KEY_HOME_ENTITY_STATUS, status.getLabel());
-        json.put(JsonConstants.KEY_SOURCE, JsonConstants.VALUE_SOURCE_MINECRAFT);
-        return json.toString();
+        MqttPayloadData data = new MqttPayloadData(entity.getLabel(), status.getLabel());
+        Gson gson = new Gson();
+        return gson.toJson(data);
 
     }
 
