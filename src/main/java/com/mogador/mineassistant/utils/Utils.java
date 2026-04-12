@@ -1,5 +1,6 @@
 package com.mogador.mineassistant.utils;
 
+import org.bukkit.entity.Player;
 import org.json.JSONObject;
 
 import com.mogador.mineassistant.constants.JsonConstants;
@@ -19,10 +20,10 @@ public class Utils {
 
     }
 
-    public static void publishLightChange(HomeEntity entity, HomeEntityStatus status) {
+    public static void publishLightChange(HomeEntity entity, HomeEntityStatus status, Player player) {
 
         String content = prepareLightPayload(entity, status);
-        MqttManager.getInstance().publish(content);
+        MqttManager.getInstance().publish(content, player);
 
     }
     

@@ -46,7 +46,7 @@ public class StatusChangeListener implements Listener {
             boolean isPowered = ((Powerable) block.getBlockData()).isPowered();
 
             if (wasPowered != isPowered) {
-                Utils.publishLightChange(HomeEntity.SALON, HomeEntityStatus.valueOf(isPowered));
+                Utils.publishLightChange(HomeEntity.SALON, HomeEntityStatus.valueOf(isPowered), event.getPlayer());
             }
         });
     }

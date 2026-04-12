@@ -1,8 +1,11 @@
 package com.mogador.mineassistant.callbacks;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -11,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mogador.mineassistant.constants.JsonConstants;
+import com.mogador.mineassistant.data.LogData;
 import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
@@ -25,7 +29,7 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
 
     @Override
     public void connectionLost(Throwable e) {
-        e.printStackTrace();
+        plugin.getLogger().log(Level.SEVERE, "Connection lost : ", e);
     }
 
     @Override
@@ -53,10 +57,17 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
         }
     }
 
-    @Override
+    @Override 
     public void deliveryComplete(IMqttDeliveryToken token) {
-        // Do nothing
-        // DM user result
+        LogData logData = Optional.ofNullable(token.getException())
+                            .map(e -> new LogData(Level.WARNING, "Error delivering message : " + e.getMessage(), e))
+                            .orElse(new LogData(Level.FINEST, "Message delivered !", null));
+
+        if(token.getUserContext() instanceof Player player) {
+            player.sendMessage(logData.getMessage());
+        }
+
+        plugin.getLogger().log(logData.getLevel(), logData.getMessage(), logData.getException());
     }
     
 }
