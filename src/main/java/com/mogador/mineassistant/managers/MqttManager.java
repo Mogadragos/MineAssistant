@@ -5,7 +5,10 @@ import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -33,7 +36,7 @@ public class MqttManager {
     private int connectTimeoutSeconds;
 
     private JavaPlugin plugin;
-    private MqttClient client;
+    private MqttAsyncClient client;
 
     public void initialize(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -49,7 +52,7 @@ public class MqttManager {
 
         try {
             MemoryPersistence persistence = new MemoryPersistence();
-            client = new MqttClient(broker, clientId, persistence);
+            client = new MqttAsyncClient(broker, clientId, persistence);
 
             MqttConnectOptions options = new MqttConnectOptions();
             options.setAutomaticReconnect(automaticReconnect);
@@ -57,30 +60,43 @@ public class MqttManager {
             options.setConnectionTimeout(connectTimeoutSeconds);
 
             plugin.getLogger().info("Connecting to MQTT broker: " + broker);
-            client.connect(options);
-            plugin.getLogger().info("MQTT connected");
+            client.connect(options, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    plugin.getLogger().info("MQTT connected");
+                    subscribe();
+                }
+                
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable e) {
+                    handleConnexionFailure(e);
+                }
+            });
         } catch(MqttException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to connect to MQTT broker", e);
-            return;
+            handleConnexionFailure(e);
         }
 
         client.setCallback(new HomeEntityStatusChangeCallback(plugin));
-
-        subscribe();
     }
-    
-    public void publish(String content) {
+
+    private void handleConnexionFailure(Throwable exception) {
+        plugin.getLogger().log(Level.SEVERE, "Failed to connect to MQTT broker", exception);
+    }
+
+    public void publish(String content, Object userContext) {
 
         if (client == null || !client.isConnected()) {
             plugin.getLogger().warning("MQTT client is not connected; skipping publish");
             return;
-        }  
+        }
 
         try {
             MqttMessage message = new MqttMessage(content.getBytes(StandardCharsets.UTF_8));
             message.setQos(qos);
 
-            client.publish(topic, message);
+            IMqttDeliveryToken token = client.publish(topic, message);
+            token.setUserContext(userContext);
+
             plugin.getLogger().finest("MQTT message published to " + topic);
         } catch(MqttException e) {
             plugin.getLogger().log(Level.SEVERE, "MQTT publish failed", e);
