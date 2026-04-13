@@ -11,7 +11,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.event.EventHandler;
 
-import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
 import com.mogador.mineassistant.managers.PowerableManager;
@@ -29,7 +28,7 @@ public class StatusChangeListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if(!event.isCancelled() && event.getBlockPlaced().getType() == Material.LEVER) {
-            PowerableManager.getInstance().add(HomeEntity.SALON, event.getBlockPlaced().getLocation());
+            PowerableManager.getInstance().add("light.salon", event.getBlockPlaced().getLocation());
         }
     }
 
@@ -46,7 +45,7 @@ public class StatusChangeListener implements Listener {
             boolean isPowered = ((Powerable) block.getBlockData()).isPowered();
 
             if (wasPowered != isPowered) {
-                Utils.publishLightChange(HomeEntity.SALON, HomeEntityStatus.valueOf(isPowered), event.getPlayer());
+                Utils.publishLightChange("light.salon", HomeEntityStatus.valueOf(isPowered), event.getPlayer());
             }
         });
     }

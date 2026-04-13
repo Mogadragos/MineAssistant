@@ -3,6 +3,7 @@ package com.mogador.mineassistant.managers;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -44,6 +45,10 @@ public class PersistenceManager {
 
     public FileConfiguration getConfig() {
         return config;
+    }
+
+    public Set<String> getKeys() {
+        return config.getKeys(false);
     }
 
     public List<?> getList(String key) {

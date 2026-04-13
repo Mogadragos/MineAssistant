@@ -14,7 +14,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 
 public class PowerableManager {
@@ -27,14 +26,14 @@ public class PowerableManager {
     private PowerableManager() {}
 
     private JavaPlugin plugin;
-    private final Map<HomeEntity, Set<Location>> powerableMap = new HashMap<>();
+    private final Map<String, Set<Location>> powerableMap = new HashMap<>();
     
     public void initialize(JavaPlugin plugin) {
         this.plugin = plugin;
 
-        for(HomeEntity entity : HomeEntity.values()) {
+        for(String entity : PersistenceManager.getInstance().getKeys()) {
 
-            List<?> rawList = PersistenceManager.getInstance().getList(entity.name());
+            List<?> rawList = PersistenceManager.getInstance().getList(entity);
 
             if(rawList != null) {
                 Set<Location> locations = getLocations(entity);
@@ -42,14 +41,14 @@ public class PowerableManager {
                     if (obj instanceof Location loc) {
                         locations.add(loc);
                     } else {
-                        plugin.getLogger().log(Level.WARNING, "Invalid entry for {0}: {1}", new Object[]{entity.name(), obj.getClass().getName()});
+                        plugin.getLogger().log(Level.WARNING, "Invalid entry for {0}: {1}", new Object[]{entity, obj.getClass().getName()});
                     }
                 }    
             }
         }
     }
 
-    public void updateStatus(HomeEntity entity, HomeEntityStatus status) {
+    public void updateStatus(String entity, HomeEntityStatus status) {
         boolean updatedInvalid = false;
         Iterator<Location> iterator = getLocations(entity).iterator();
 
@@ -72,30 +71,30 @@ public class PowerableManager {
         if(updatedInvalid) persist(entity);
     }
 
-    private void editLoc(HomeEntity entity, Location loc, boolean add) {
+    private void editLoc(String entity, Location loc, boolean add) {
         boolean success = add ? getLocations(entity).add(loc) : getLocations(entity).remove(loc);
         String actionWord = add ? "Added" : "Removed";
         
         plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, existing: {3}", 
-            new Object[]{actionWord, entity.name(), loc, success});
+            new Object[]{actionWord, entity, loc, success});
         
         if(success) persist(entity);
     }
 
-    public void add(HomeEntity entity, Location loc) {
+    public void add(String entity, Location loc) {
         editLoc(entity, loc, true);
     }
 
-    public void remove(HomeEntity entity, Location loc) {
+    public void remove(String entity, Location loc) {
         editLoc(entity, loc, false);
     }
 
-    private Set<Location> getLocations(HomeEntity entity) {
+    private Set<Location> getLocations(String entity) {
         return powerableMap.computeIfAbsent(entity, k -> new HashSet<>());
     }
 
-    private void persist(HomeEntity entity) {
-        PersistenceManager.getInstance().setList(entity.name(), new ArrayList<>(getLocations(entity)));
+    private void persist(String entity) {
+        PersistenceManager.getInstance().setList(entity, new ArrayList<>(getLocations(entity)));
     }
     
 }
