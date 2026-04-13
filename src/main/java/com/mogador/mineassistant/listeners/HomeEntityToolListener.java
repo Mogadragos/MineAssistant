@@ -11,7 +11,8 @@ import com.mogador.mineassistant.managers.HomeEntityToolManager;
 
 public class HomeEntityToolListener implements Listener {
 
-    private final String TOOL_NAME_KEY = "::";
+    private final String TOOL_KEY = "::";
+    private final int TOOL_KEY_LENGTH = TOOL_KEY.length();
     
     private final JavaPlugin plugin;
 
@@ -25,8 +26,8 @@ public class HomeEntityToolListener implements Listener {
         if(!Material.REDSTONE_TORCH.equals(event.getResult().getType())) return;
 
         String renameText = event.getView().getRenameText();
-        if(renameText.length() > 2 && renameText.startsWith(TOOL_NAME_KEY)) {
-            HomeEntityToolManager.getInstance().enableTool(event.getResult(), renameText);
+        if(renameText.length() > TOOL_KEY_LENGTH && renameText.startsWith(TOOL_KEY)) {
+            HomeEntityToolManager.getInstance().enableTool(event.getResult(), renameText, TOOL_KEY_LENGTH);
         } else if(HomeEntityToolManager.getInstance().isTool(event.getResult())) {
             HomeEntityToolManager.getInstance().disableTool(event.getResult());
         }

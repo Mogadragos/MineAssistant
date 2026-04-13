@@ -32,12 +32,12 @@ public class HomeEntityToolManager {
         this.key = new NamespacedKey(plugin, "entity_id");
     }
 
-    public void enableTool(ItemStack tool, String name) {
+    public void enableTool(ItemStack tool, String name, int toolKeyLength) {
         ItemMeta meta = tool.getItemMeta();
 
         meta.setDisplayName(COLOR.concat(name));
 
-        String entityId = name.substring(2);
+        String entityId = name.substring(toolKeyLength);
         meta.setLore(buildLore(entityId));
         meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, entityId);
         tool.setItemMeta(meta);
@@ -55,7 +55,7 @@ public class HomeEntityToolManager {
         meta.setLore(null);
         meta.getPersistentDataContainer().remove(key);
         tool.setItemMeta(meta);
-        
+
         plugin.getLogger().finest("Tool disabled");
     }
 
