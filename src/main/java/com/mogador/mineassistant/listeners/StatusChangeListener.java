@@ -1,6 +1,7 @@
 package com.mogador.mineassistant.listeners;
 
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -34,10 +35,12 @@ public class StatusChangeListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         Block block = event.getClickedBlock();
-        if (block == null || block.getType() != Material.LEVER) return;
+        if(block == null || block.getType() != Material.LEVER) return;
+
+        if(Result.DENY.equals(event.useInteractedBlock())) return;
 
         boolean wasPowered = ((Powerable) block.getBlockData()).isPowered();
 
