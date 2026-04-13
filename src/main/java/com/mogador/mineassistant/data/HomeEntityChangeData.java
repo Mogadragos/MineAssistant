@@ -2,12 +2,11 @@ package com.mogador.mineassistant.data;
 
 import com.google.gson.annotations.SerializedName;
 import com.mogador.mineassistant.constants.JsonConstants;
-import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 
 public class HomeEntityChangeData {
     @SerializedName("entity_id")
-    private HomeEntity entity;
+    private String entity;
     
     @SerializedName("status")
     private HomeEntityStatus status;
@@ -17,13 +16,13 @@ public class HomeEntityChangeData {
 
     public HomeEntityChangeData() {} // Mandatory for Gson
 
-    public HomeEntityChangeData(HomeEntity entity, HomeEntityStatus status) {
+    public HomeEntityChangeData(String entity, HomeEntityStatus status) {
         this.entity = entity;
         this.status = status;
         this.source = JsonConstants.SOURCE_MINECRAFT;
     }
 
-    public HomeEntity getEntity() {
+    public String getEntity() {
         return entity;
     }
 

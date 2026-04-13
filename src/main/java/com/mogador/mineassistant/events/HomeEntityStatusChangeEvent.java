@@ -3,14 +3,13 @@ package com.mogador.mineassistant.events;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.mogador.mineassistant.enums.HomeEntity;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 
 public class HomeEntityStatusChangeEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    private final HomeEntity entity;
+    private final String entity;
     private final HomeEntityStatus status;
 
     public static HandlerList getHandlerList() {
@@ -22,12 +21,12 @@ public class HomeEntityStatusChangeEvent extends Event {
         return HANDLERS;
     }
 
-    public HomeEntityStatusChangeEvent(HomeEntity entity, HomeEntityStatus status) {
+    public HomeEntityStatusChangeEvent(String entity, HomeEntityStatus status) {
         this.entity = entity;
         this.status = status;
     }
 
-    public HomeEntity getEntity() {
+    public String getEntity() {
         return entity;
     }
 
@@ -37,6 +36,6 @@ public class HomeEntityStatusChangeEvent extends Event {
 
     @Override
     public String toString() {
-        return "HomeEntityStatusChangeEvent{entity=" + entity.name() + ", status=" + status.name() + '}';
+        return "HomeEntityStatusChangeEvent{entity=" + entity + ", status=" + status.name() + '}';
     }
 }
