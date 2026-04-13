@@ -3,7 +3,6 @@ package com.mogador.mineassistant.managers;
 import java.util.List;
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;

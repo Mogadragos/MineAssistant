@@ -3,7 +3,7 @@ package com.mogador.mineassistant.listeners;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockCanBuildEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -34,8 +34,10 @@ public class HomeEntityToolListener implements Listener {
     }
 
     @EventHandler
-    public void onToolPlace(BlockCanBuildEvent event) {
-        // TODO - Prevent user to place tool
-        // plugin.getLogger().info(event.getBlockData().toString());
+    public void onToolPlace(BlockPlaceEvent event) {
+        if(HomeEntityToolManager.getInstance().isTool(event.getItemInHand())) {
+            event.setBuild(false);
+            plugin.getLogger().finest("Can't build an entity tool");
+        }
     }
 }
