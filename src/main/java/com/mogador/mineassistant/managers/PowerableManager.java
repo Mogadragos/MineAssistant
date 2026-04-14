@@ -1,5 +1,6 @@
 package com.mogador.mineassistant.managers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -116,6 +117,6 @@ public class PowerableManager {
     }
 
     private void persist(String entity) {
-        PersistenceManager.getInstance().setList(entity, List.of(getLocations(entity)));
+        PersistenceManager.getInstance().setList(entity, new ArrayList<>(getLocations(entity)));
     }
 }
