@@ -48,6 +48,10 @@ public class HomeEntityToolManager {
         return tool.getItemMeta().getPersistentDataContainer().has(key);
     }
 
+    public String getEntity(ItemStack tool) {
+        return tool.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
+    }
+
     public void disableTool(ItemStack tool) {
         ItemMeta meta = tool.getItemMeta();
 

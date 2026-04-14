@@ -1,13 +1,19 @@
 package com.mogador.mineassistant.listeners;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mogador.mineassistant.managers.HomeEntityToolManager;
+import com.mogador.mineassistant.managers.PowerableManager;
 
 public class HomeEntityToolListener implements Listener {
 
@@ -37,7 +43,37 @@ public class HomeEntityToolListener implements Listener {
     public void onToolPlace(BlockPlaceEvent event) {
         if(HomeEntityToolManager.getInstance().isTool(event.getItemInHand())) {
             event.setBuild(false);
+            event.setCancelled(true);
             plugin.getLogger().finest("Can't build an entity tool");
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerInteractWithLever(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null || !Material.LEVER.equals(block.getType())) return;
+
+        // If used item is the tool
+        if(event.getItem() != null && HomeEntityToolManager.getInstance().isTool(event.getItem())) {
+            // Cancel event
+            event.setUseInteractedBlock(Result.DENY);
+
+            // Add / Remove the lever
+            String entity = HomeEntityToolManager.getInstance().getEntity(event.getItem());
+            boolean success = false;
+            String message = "";
+
+            if(PowerableManager.getInstance().isSynchronized(event.getClickedBlock())) {
+                success = PowerableManager.getInstance().remove(entity, event.getClickedBlock());
+                message = String.format("[%s] - Desynchronisation ", plugin.getName());
+            } else {
+                success = PowerableManager.getInstance().add(entity, event.getClickedBlock());
+                message = String.format("[%s] - Synchronisation ", plugin.getName());
+            }
+
+            event.getPlayer().sendMessage(message.concat(success ? "succeded" : "failed"));
         }
     }
 }

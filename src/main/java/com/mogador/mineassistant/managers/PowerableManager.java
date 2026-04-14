@@ -10,8 +10,11 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mogador.mineassistant.enums.HomeEntityStatus;
@@ -27,9 +30,11 @@ public class PowerableManager {
 
     private JavaPlugin plugin;
     private final Map<String, Set<Location>> powerableMap = new HashMap<>();
+    private NamespacedKey key;
     
     public void initialize(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.key = new NamespacedKey(plugin, "entity_id");
 
         for(String entity : PersistenceManager.getInstance().getKeys()) {
 
@@ -56,45 +61,79 @@ public class PowerableManager {
             Location loc = iterator.next();
             Block block = loc.getBlock();
 
-            if(block.getBlockData() instanceof Powerable powerable) {
+            if(isSynchronized(block)) {
+                Powerable powerable = (Powerable) block.getBlockData();
                 boolean desired = status.isOn();
                 if(powerable.isPowered() != desired) {
                     powerable.setPowered(desired);
                     block.setBlockData(powerable);
                 }
             } else {
+                // Kept to unsure PersistentData is the source of truth
                 updatedInvalid = true;
                 iterator.remove();
+                plugin.getLogger().warning(String.format("Removal that shouldn't exist have occured for %s at %s", entity, loc.toString()));
             }
         }
 
         if(updatedInvalid) persist(entity);
     }
 
-    private void editLoc(String entity, Location loc, boolean add) {
-        boolean success = add ? getLocations(entity).add(loc) : getLocations(entity).remove(loc);
-        String actionWord = add ? "Added" : "Removed";
-        
-        plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, existing: {3}", 
-            new Object[]{actionWord, entity, loc, success});
-        
-        if(success) persist(entity);
+    public boolean add(String entity, Block block) {
+        boolean success = edit(entity, block, true);
+        // Add in persistentData if success
+        if(success) block.getChunk().getPersistentDataContainer().set(genBlockKey(block), PersistentDataType.STRING, entity);
+        return success;
     }
 
-    public void add(String entity, Location loc) {
-        editLoc(entity, loc, true);
+    public boolean remove(String entity, Block block) {
+        boolean success = edit(entity, block, false);
+        // Remove from persistentData in all cases
+        block.getChunk().getPersistentDataContainer().remove(genBlockKey(block));
+        return success;
     }
 
-    public void remove(String entity, Location loc) {
-        editLoc(entity, loc, false);
+    public boolean remove(Block block) {
+        return remove(getEntity(block), block);
     }
 
     private Set<Location> getLocations(String entity) {
         return powerableMap.computeIfAbsent(entity, k -> new HashSet<>());
     }
 
+    private boolean edit(String entity, Block block, boolean add) {
+        String actionWord = add ? "Added" : "Removed";
+
+        Set<Location> locations = getLocations(entity);
+        boolean success = add ? locations.add(block.getLocation()) : locations.remove(block.getLocation());
+        
+        plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, success: {3}", 
+            new Object[]{actionWord, entity, block.getLocation(), success});
+        
+        if(success) persist(entity);
+
+        return success;
+    }
+
     private void persist(String entity) {
         PersistenceManager.getInstance().setList(entity, new ArrayList<>(getLocations(entity)));
     }
     
+    // PersistentDataContainer
+
+    public boolean isSynchronized(Block block) {
+        return block.getChunk().getPersistentDataContainer().has(genBlockKey(block));
+    }
+    
+    public String getEntity(Block block) {
+        return block.getChunk().getPersistentDataContainer().get(genBlockKey(block), PersistentDataType.STRING);
+    }
+
+    private NamespacedKey genBlockKey(Block block) {
+        return new NamespacedKey(key.toString(), locationXYZToString(block));
+    }
+
+    private String locationXYZToString(Block block) {
+        return String.format("%d.%d.%d", block.getX(), block.getY(), block.getZ());
+    }
 }
