@@ -13,7 +13,7 @@ import org.bukkit.event.EventHandler;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
 import com.mogador.mineassistant.managers.PowerableManager;
-import com.mogador.mineassistant.utils.Utils;
+import com.mogador.mineassistant.utils.PublishingUtils;
 
 public class StatusChangeListener implements Listener {
     
@@ -38,7 +38,8 @@ public class StatusChangeListener implements Listener {
             boolean isPowered = ((Powerable) block.getBlockData()).isPowered();
 
             if (wasPowered != isPowered) {
-                Utils.publishLightChange(entity, HomeEntityStatus.valueOf(isPowered), event.getPlayer());
+                PublishingUtils.publishLightChange(entity, HomeEntityStatus.valueOf(isPowered), event.getPlayer());
+                PowerableManager.getInstance().updateStatus(entity, isPowered);
             }
         });
     }

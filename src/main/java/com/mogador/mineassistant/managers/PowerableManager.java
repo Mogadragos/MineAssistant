@@ -1,5 +1,6 @@
 package com.mogador.mineassistant.managers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -48,6 +49,10 @@ public class PowerableManager {
     }
 
     public void updateStatus(String entity, HomeEntityStatus status) {
+        updateStatus(entity, status.isOn());
+    }
+
+    public void updateStatus(String entity, boolean desired) {
         boolean updatedInvalid = false;
         Iterator<Location> iterator = getLocations(entity).iterator();
 
@@ -56,7 +61,6 @@ public class PowerableManager {
             Block block = loc.getBlock();
 
             if(block.getBlockData() instanceof Powerable powerable) {
-                boolean desired = status.isOn();
                 if(powerable.isPowered() != desired) {
                     powerable.setPowered(desired);
                     block.setBlockData(powerable);
@@ -116,6 +120,6 @@ public class PowerableManager {
     }
 
     private void persist(String entity) {
-        PersistenceManager.getInstance().setList(entity, List.of(getLocations(entity)));
+        PersistenceManager.getInstance().setList(entity, new ArrayList<>(getLocations(entity)));
     }
 }
