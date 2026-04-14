@@ -26,7 +26,7 @@ public class MineAssistant extends JavaPlugin {
         
         // Register listeners
         getServer().getPluginManager().registerEvents(new StatusChangeListener(this), this);
-        getServer().getPluginManager().registerEvents(new SyncBreakListener(), this);
+        getServer().getPluginManager().registerEvents(new SyncBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new HomeEntityToolListener(this), this);
         
         getLogger().info("MineAssistant has been enabled!");

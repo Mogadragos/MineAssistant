@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,11 +26,9 @@ public class PowerableManager {
 
     private JavaPlugin plugin;
     private final Map<String, Set<Location>> powerableMap = new HashMap<>();
-    private NamespacedKey key;
     
     public void initialize(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.key = new NamespacedKey(plugin, "entity_id");
 
         for(String entity : PersistenceManager.getInstance().getKeys()) {
 
@@ -44,7 +40,7 @@ public class PowerableManager {
                     if (obj instanceof Location loc) {
                         locations.add(loc);
                     } else {
-                        plugin.getLogger().log(Level.WARNING, "Invalid entry for {0}: {1}", new Object[]{entity, obj.getClass().getName()});
+                        plugin.getLogger().warning(String.format("Invalid entry for %s: %s", entity, obj.getClass().getName()));
                     }
                 }    
             }
@@ -107,13 +103,12 @@ public class PowerableManager {
     }
 
     private boolean edit(String entity, Block block, boolean add) {
-        String actionWord = add ? "Added" : "Removed";
+        String actionWord = add ? "Add" : "Remove";
 
         Set<Location> locations = getLocations(entity);
         boolean success = add ? locations.add(block.getLocation()) : locations.remove(block.getLocation());
         
-        plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, success: {3}", 
-            new Object[]{actionWord, entity, block.getLocation(), success});
+        plugin.getLogger().finest(String.format("%s lever for %s: %s, success: %b", actionWord, entity, block.getLocation(), success));
         
         if(success) persist(entity);
 

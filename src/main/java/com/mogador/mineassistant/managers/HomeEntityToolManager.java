@@ -41,7 +41,7 @@ public class HomeEntityToolManager {
         meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, entityId);
         tool.setItemMeta(meta);
 
-        plugin.getLogger().finest("Tool for " + entityId + " enabled");
+        plugin.getLogger().finest("Tool enabled");
     }
 
     public boolean isTool(ItemStack tool) {
