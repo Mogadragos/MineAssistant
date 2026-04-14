@@ -33,4 +33,9 @@ public class HomeEntityChangeData {
     public String getSource() {
         return source;
     }
+
+    @Override
+    public String toString() {
+        return String.format("{Entity: %s; Status: %s; Source: %s}", entity, status, source);
+    }
 }
