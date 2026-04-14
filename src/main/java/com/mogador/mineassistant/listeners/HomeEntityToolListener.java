@@ -56,24 +56,24 @@ public class HomeEntityToolListener implements Listener {
         if (block == null || !Material.LEVER.equals(block.getType())) return;
 
         // If used item is the tool
-        if(event.getItem() != null && HomeEntityToolManager.getInstance().isTool(event.getItem())) {
-            // Cancel event
-            event.setUseInteractedBlock(Result.DENY);
+        if(event.getItem() == null || !HomeEntityToolManager.getInstance().isTool(event.getItem())) return;
 
-            // Add / Remove the lever
-            String entity = HomeEntityToolManager.getInstance().getEntity(event.getItem());
-            boolean success = false;
-            String message = "";
+        // Cancel event
+        event.setUseInteractedBlock(Result.DENY);
 
-            if(PowerableManager.getInstance().isSynchronized(event.getClickedBlock())) {
-                success = PowerableManager.getInstance().remove(entity, event.getClickedBlock());
-                message = String.format("[%s] - Desynchronisation ", plugin.getName());
-            } else {
-                success = PowerableManager.getInstance().add(entity, event.getClickedBlock());
-                message = String.format("[%s] - Synchronisation ", plugin.getName());
-            }
+        // Add / Remove the lever
+        String entity = HomeEntityToolManager.getInstance().getEntity(event.getItem());
+        boolean success = false;
+        String message = "";
 
-            event.getPlayer().sendMessage(message.concat(success ? "succeded" : "failed"));
+        if(PowerableManager.getInstance().isSynchronized(event.getClickedBlock())) {
+            success = PowerableManager.getInstance().remove(entity, event.getClickedBlock());
+            message = String.format("[%s] - Desynchronisation ", plugin.getName());
+        } else {
+            success = PowerableManager.getInstance().add(entity, event.getClickedBlock());
+            message = String.format("[%s] - Synchronisation ", plugin.getName());
         }
+
+        event.getPlayer().sendMessage(message.concat(success ? "succeded" : "failed"));
     }
 }
