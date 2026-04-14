@@ -25,14 +25,6 @@ public class StatusChangeListener implements Listener {
         this.plugin = plugin;
     }
 
-    // TODO - To Remove
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
-        if(!event.isCancelled() && event.getBlockPlaced().getType() == Material.LEVER) {
-            PowerableManager.getInstance().add("light.salon", event.getBlockPlaced().getLocation());
-        }
-    }
-
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -42,13 +34,15 @@ public class StatusChangeListener implements Listener {
 
         if(Result.DENY.equals(event.useInteractedBlock())) return;
 
+        if(!PowerableManager.getInstance().isSynchronized(block)) return;
+
         boolean wasPowered = ((Powerable) block.getBlockData()).isPowered();
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             boolean isPowered = ((Powerable) block.getBlockData()).isPowered();
 
             if (wasPowered != isPowered) {
-                Utils.publishLightChange("light.salon", HomeEntityStatus.valueOf(isPowered), event.getPlayer());
+                Utils.publishLightChange(PowerableManager.getInstance().getEntity(block), HomeEntityStatus.valueOf(isPowered), event.getPlayer());
             }
         });
     }

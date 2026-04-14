@@ -63,15 +63,14 @@ public class HomeEntityToolListener implements Listener {
 
             // Add / Remove the lever
             String entity = HomeEntityToolManager.getInstance().getEntity(event.getItem());
-            Location loc = event.getClickedBlock().getLocation();
             boolean success = false;
             String message = "";
 
-            if(PowerableManager.getInstance().has(entity, loc)) {
-                success = PowerableManager.getInstance().remove(entity, loc);
+            if(PowerableManager.getInstance().has(entity, event.getClickedBlock())) {
+                success = PowerableManager.getInstance().remove(entity, event.getClickedBlock());
                 message = String.format("[%s] - Desynchronisation ", plugin.getName());
             } else {
-                success = PowerableManager.getInstance().add(entity, loc);
+                success = PowerableManager.getInstance().add(entity, event.getClickedBlock());
                 message = String.format("[%s] - Synchronisation ", plugin.getName());
             }
 
