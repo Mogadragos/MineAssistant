@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mogador.mineassistant.listeners.HomeEntityToolListener;
 import com.mogador.mineassistant.listeners.StatusChangeListener;
+import com.mogador.mineassistant.listeners.SyncBreakListener;
 import com.mogador.mineassistant.managers.PowerableManager;
 import com.mogador.mineassistant.managers.HomeEntityToolManager;
 import com.mogador.mineassistant.managers.MqttManager;
@@ -25,6 +26,7 @@ public class MineAssistant extends JavaPlugin {
         
         // Register listeners
         getServer().getPluginManager().registerEvents(new StatusChangeListener(this), this);
+        getServer().getPluginManager().registerEvents(new SyncBreakListener(), this);
         getServer().getPluginManager().registerEvents(new HomeEntityToolListener(this), this);
         
         getLogger().info("MineAssistant has been enabled!");

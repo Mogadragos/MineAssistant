@@ -61,16 +61,18 @@ public class PowerableManager {
             Location loc = iterator.next();
             Block block = loc.getBlock();
 
-            if(block.getBlockData() instanceof Powerable powerable) {
+            if(isSynchronized(block)) {
+                Powerable powerable = (Powerable) block.getBlockData();
                 boolean desired = status.isOn();
                 if(powerable.isPowered() != desired) {
                     powerable.setPowered(desired);
                     block.setBlockData(powerable);
                 }
             } else {
-                // TODO - Will be done when block is destroyed 
+                // Kept to unsure PersistentData is the source of truth
                 updatedInvalid = true;
                 iterator.remove();
+                plugin.getLogger().warning(String.format("Removal that shouldn't exist have occured for %s at %s", entity, loc.toString()));
             }
         }
 
@@ -78,11 +80,21 @@ public class PowerableManager {
     }
 
     public boolean add(String entity, Block block) {
-        return edit(entity, block, true);
+        boolean success = edit(entity, block, true);
+        // Add in persistentData if success
+        if(success) block.getChunk().getPersistentDataContainer().set(genBlockKey(block), PersistentDataType.STRING, entity);
+        return success;
     }
 
     public boolean remove(String entity, Block block) {
-        return edit(entity, block, false);
+        boolean success = edit(entity, block, false);
+        // Remove from persistentData in all cases
+        block.getChunk().getPersistentDataContainer().remove(genBlockKey(block));
+        return success;
+    }
+
+    public boolean remove(Block block) {
+        return remove(getEntity(block), block);
     }
 
     private Set<Location> getLocations(String entity) {
@@ -98,14 +110,7 @@ public class PowerableManager {
         plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, success: {3}", 
             new Object[]{actionWord, entity, block.getLocation(), success});
         
-        if(success) {
-            PersistentDataContainer container = block.getChunk().getPersistentDataContainer();
-            NamespacedKey blockKey = genBlockKey(block);
-            if(add) container.set(blockKey, PersistentDataType.STRING, entity);
-            else container.remove(blockKey);
-
-            persist(entity);
-        }
+        if(success) persist(entity);
 
         return success;
     }
