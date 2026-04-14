@@ -1,6 +1,5 @@
 package com.mogador.mineassistant.listeners;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -66,7 +65,7 @@ public class HomeEntityToolListener implements Listener {
             boolean success = false;
             String message = "";
 
-            if(PowerableManager.getInstance().has(entity, event.getClickedBlock())) {
+            if(PowerableManager.getInstance().isSynchronized(event.getClickedBlock())) {
                 success = PowerableManager.getInstance().remove(entity, event.getClickedBlock());
                 message = String.format("[%s] - Desynchronisation ", plugin.getName());
             } else {

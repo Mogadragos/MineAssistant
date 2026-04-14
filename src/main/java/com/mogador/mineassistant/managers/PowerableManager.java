@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -67,6 +68,7 @@ public class PowerableManager {
                     block.setBlockData(powerable);
                 }
             } else {
+                // TODO - Will be done when block is destroyed 
                 updatedInvalid = true;
                 iterator.remove();
             }
@@ -75,42 +77,45 @@ public class PowerableManager {
         if(updatedInvalid) persist(entity);
     }
 
-    private boolean editLoc(String entity, Location loc, boolean add) {
-        boolean success = add ? getLocations(entity).add(loc) : getLocations(entity).remove(loc);
-        String actionWord = add ? "Added" : "Removed";
-        
-        plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, existing: {3}", 
-            new Object[]{actionWord, entity, loc, success});
-        
-        if(success) persist(entity);
-
-        return success;
-    }
-
     public boolean add(String entity, Block block) {
-        boolean success = editLoc(entity, block.getLocation(), true);
-        if(success) block.getChunk().getPersistentDataContainer().set(genBlockKey(block), PersistentDataType.STRING, entity);
-        return success;
+        return edit(entity, block, true);
     }
 
     public boolean remove(String entity, Block block) {
-        boolean success = editLoc(entity, block.getLocation(), false);
-        if(success) block.getChunk().getPersistentDataContainer().remove(genBlockKey(block));
-        return success;
-    }
-
-    public boolean has(String entity, Block block) {
-        return getLocations(entity).contains(block.getLocation());
+        return edit(entity, block, false);
     }
 
     private Set<Location> getLocations(String entity) {
         return powerableMap.computeIfAbsent(entity, k -> new HashSet<>());
     }
 
+    private boolean edit(String entity, Block block, boolean add) {
+        String actionWord = add ? "Added" : "Removed";
+
+        Set<Location> locations = getLocations(entity);
+        boolean success = add ? locations.add(block.getLocation()) : locations.remove(block.getLocation());
+        
+        plugin.getLogger().log(Level.FINEST, "{0} lever for {1}: {2}, success: {3}", 
+            new Object[]{actionWord, entity, block.getLocation(), success});
+        
+        if(success) {
+            PersistentDataContainer container = block.getChunk().getPersistentDataContainer();
+            NamespacedKey blockKey = genBlockKey(block);
+            if(add) container.set(blockKey, PersistentDataType.STRING, entity);
+            else container.remove(blockKey);
+
+            persist(entity);
+        }
+
+        return success;
+    }
+
     private void persist(String entity) {
         PersistenceManager.getInstance().setList(entity, new ArrayList<>(getLocations(entity)));
     }
     
+    // PersistentDataContainer
+
     public boolean isSynchronized(Block block) {
         return block.getChunk().getPersistentDataContainer().has(genBlockKey(block));
     }
