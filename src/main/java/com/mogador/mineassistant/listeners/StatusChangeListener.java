@@ -39,6 +39,7 @@ public class StatusChangeListener implements Listener {
 
             if (wasPowered != isPowered) {
                 Utils.publishLightChange(entity, HomeEntityStatus.valueOf(isPowered), event.getPlayer());
+                PowerableManager.getInstance().updateStatus(entity, isPowered);
             }
         });
     }

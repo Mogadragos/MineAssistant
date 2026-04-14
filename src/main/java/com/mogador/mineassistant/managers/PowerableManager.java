@@ -49,6 +49,10 @@ public class PowerableManager {
     }
 
     public void updateStatus(String entity, HomeEntityStatus status) {
+        updateStatus(entity, status.isOn());
+    }
+
+    public void updateStatus(String entity, boolean desired) {
         boolean updatedInvalid = false;
         Iterator<Location> iterator = getLocations(entity).iterator();
 
@@ -57,7 +61,6 @@ public class PowerableManager {
             Block block = loc.getBlock();
 
             if(block.getBlockData() instanceof Powerable powerable) {
-                boolean desired = status.isOn();
                 if(powerable.isPowered() != desired) {
                     powerable.setPowered(desired);
                     block.setBlockData(powerable);
