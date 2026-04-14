@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,6 +18,9 @@ public class PersistenceManager {
         return instance;
     }
     private PersistenceManager() {}
+
+    private final char DOT = '.';
+    private final char ESCAPING_CHAR = '¤';
 
     private JavaPlugin plugin;
     private File persistenceFile;
@@ -48,15 +52,15 @@ public class PersistenceManager {
     }
 
     public Set<String> getKeys() {
-        return config.getKeys(false);
+        return config.getKeys(false).stream().map(this::unescapeDot).collect(Collectors.toSet());
     }
 
     public List<?> getList(String key) {
-        return config.getList(key);
+        return config.getList(escapeDot(key));
     }
 
     public void setList(String key, List<?> list) {
-        config.set(key, list);
+        config.set(escapeDot(key), list);
         save();
     }
 
@@ -68,4 +72,11 @@ public class PersistenceManager {
         }
     }
 
+    public String escapeDot(String str) {
+        return str.replace(DOT, ESCAPING_CHAR);
+    }
+
+    public String unescapeDot(String str) {
+        return str.replace(ESCAPING_CHAR, DOT);
+    }
 }
