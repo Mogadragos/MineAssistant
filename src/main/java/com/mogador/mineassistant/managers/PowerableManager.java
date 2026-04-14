@@ -1,20 +1,18 @@
 package com.mogador.mineassistant.managers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Powerable;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mogador.mineassistant.enums.HomeEntityStatus;
@@ -61,15 +59,14 @@ public class PowerableManager {
             Location loc = iterator.next();
             Block block = loc.getBlock();
 
-            if(isSynchronized(block)) {
-                Powerable powerable = (Powerable) block.getBlockData();
+            if(block.getBlockData() instanceof Powerable powerable) {
                 boolean desired = status.isOn();
                 if(powerable.isPowered() != desired) {
                     powerable.setPowered(desired);
                     block.setBlockData(powerable);
                 }
             } else {
-                // Kept to unsure PersistentData is the source of truth
+                // Kept to avoid undeleted powerable
                 updatedInvalid = true;
                 iterator.remove();
                 plugin.getLogger().warning(String.format("Removal that shouldn't exist have occured for %s at %s", entity, loc.toString()));
@@ -80,21 +77,29 @@ public class PowerableManager {
     }
 
     public boolean add(String entity, Block block) {
-        boolean success = edit(entity, block, true);
-        // Add in persistentData if success
-        if(success) block.getChunk().getPersistentDataContainer().set(genBlockKey(block), PersistentDataType.STRING, entity);
-        return success;
+        return edit(entity, block, true);
     }
 
     public boolean remove(String entity, Block block) {
-        boolean success = edit(entity, block, false);
-        // Remove from persistentData in all cases
-        block.getChunk().getPersistentDataContainer().remove(genBlockKey(block));
-        return success;
+        return edit(entity, block, false);
     }
 
+    // Use remove(String entity, Block block) if possible
     public boolean remove(Block block) {
         return remove(getEntity(block), block);
+    }
+
+    public boolean isSynchronized(Block block) {
+        return powerableMap.values().stream()
+        .anyMatch(v -> v.contains(block.getLocation()));
+    }
+    
+    public String getEntity(Block block) {
+        return powerableMap.entrySet().stream()
+        .filter(e -> e.getValue().contains(block.getLocation()))
+        .map(Entry::getKey)
+        .findAny()
+        .orElse(null);
     }
 
     private Set<Location> getLocations(String entity) {
@@ -116,24 +121,6 @@ public class PowerableManager {
     }
 
     private void persist(String entity) {
-        PersistenceManager.getInstance().setList(entity, new ArrayList<>(getLocations(entity)));
-    }
-    
-    // PersistentDataContainer
-
-    public boolean isSynchronized(Block block) {
-        return block.getChunk().getPersistentDataContainer().has(genBlockKey(block));
-    }
-    
-    public String getEntity(Block block) {
-        return block.getChunk().getPersistentDataContainer().get(genBlockKey(block), PersistentDataType.STRING);
-    }
-
-    private NamespacedKey genBlockKey(Block block) {
-        return new NamespacedKey(key.toString(), locationXYZToString(block));
-    }
-
-    private String locationXYZToString(Block block) {
-        return String.format("%d.%d.%d", block.getX(), block.getY(), block.getZ());
+        PersistenceManager.getInstance().setList(entity, List.of(getLocations(entity)));
     }
 }
