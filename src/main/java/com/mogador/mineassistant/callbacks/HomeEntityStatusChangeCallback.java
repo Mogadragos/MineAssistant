@@ -17,6 +17,7 @@ import com.mogador.mineassistant.constants.JsonConstants;
 import com.mogador.mineassistant.data.LogData;
 import com.mogador.mineassistant.data.HomeEntityChangeData;
 import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
+import com.mogador.mineassistant.utils.PlayerMessageUtils;
 
 public class HomeEntityStatusChangeCallback implements MqttCallback {
 
@@ -62,7 +63,7 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
                             .orElse(new LogData(Level.FINEST, "Message delivered !", null));
 
         if(token.getUserContext() instanceof Player player) {
-            player.sendMessage(logData.getMessage());
+            PlayerMessageUtils.formatAndSend(plugin, player, logData.getMessage());
         }
 
         plugin.getLogger().log(logData.getLevel(), logData.getMessage(), logData.getException());

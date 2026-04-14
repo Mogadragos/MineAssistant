@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mogador.mineassistant.managers.HomeEntityToolManager;
 import com.mogador.mineassistant.managers.PowerableManager;
+import com.mogador.mineassistant.utils.PlayerMessageUtils;
 
 public class HomeEntityToolListener implements Listener {
 
@@ -68,12 +69,12 @@ public class HomeEntityToolListener implements Listener {
 
         if(PowerableManager.getInstance().isSynchronized(event.getClickedBlock())) {
             success = PowerableManager.getInstance().remove(entity, event.getClickedBlock());
-            message = String.format("[%s] - Desynchronisation ", plugin.getName());
+            message = "Desynchronisation ";
         } else {
             success = PowerableManager.getInstance().add(entity, event.getClickedBlock());
-            message = String.format("[%s] - Synchronisation ", plugin.getName());
+            message = "Synchronisation ";
         }
 
-        event.getPlayer().sendMessage(message.concat(success ? "succeded" : "failed"));
+        PlayerMessageUtils.formatAndSend(plugin, event.getPlayer(), message.concat(success ? "succeded" : "failed"));
     }
 }
