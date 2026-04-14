@@ -11,12 +11,12 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.mogador.mineassistant.constants.JsonConstants;
 import com.mogador.mineassistant.data.LogData;
 import com.mogador.mineassistant.data.HomeEntityChangeData;
 import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
+import com.mogador.mineassistant.utils.JsonUtils;
 import com.mogador.mineassistant.utils.PlayerMessageUtils;
 
 public class HomeEntityStatusChangeCallback implements MqttCallback {
@@ -36,8 +36,7 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         byte[] payload = message.getPayload();
         try {
-            Gson gson = new Gson();
-            HomeEntityChangeData data = gson.fromJson(new String(payload, StandardCharsets.UTF_8), HomeEntityChangeData.class);
+            HomeEntityChangeData data = JsonUtils.fromJson(new String(payload, StandardCharsets.UTF_8), HomeEntityChangeData.class);
             if(!JsonConstants.SOURCE_MINECRAFT.equals(data.getSource())) {
                 plugin.getLogger().info("Message received");
 

@@ -1,12 +1,8 @@
 package com.mogador.mineassistant.enums;
 
-import com.google.gson.annotations.SerializedName;
-
 public enum HomeEntityStatus {
-  @SerializedName("on")
   ON(true),
 
-  @SerializedName("off")
   OFF(false);
 
   private final boolean isOn;
