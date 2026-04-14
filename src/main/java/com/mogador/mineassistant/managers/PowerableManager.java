@@ -71,7 +71,7 @@ public class PowerableManager {
         if(updatedInvalid) persist(entity);
     }
 
-    private void editLoc(String entity, Location loc, boolean add) {
+    private boolean editLoc(String entity, Location loc, boolean add) {
         boolean success = add ? getLocations(entity).add(loc) : getLocations(entity).remove(loc);
         String actionWord = add ? "Added" : "Removed";
         
@@ -79,14 +79,20 @@ public class PowerableManager {
             new Object[]{actionWord, entity, loc, success});
         
         if(success) persist(entity);
+
+        return success;
     }
 
-    public void add(String entity, Location loc) {
-        editLoc(entity, loc, true);
+    public boolean add(String entity, Location loc) {
+        return editLoc(entity, loc, true);
     }
 
-    public void remove(String entity, Location loc) {
-        editLoc(entity, loc, false);
+    public boolean remove(String entity, Location loc) {
+        return editLoc(entity, loc, false);
+    }
+
+    public boolean has(String entity, Location loc) {
+        return getLocations(entity).contains(loc);
     }
 
     private Set<Location> getLocations(String entity) {

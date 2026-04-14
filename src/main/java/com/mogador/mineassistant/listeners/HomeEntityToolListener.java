@@ -1,5 +1,6 @@
 package com.mogador.mineassistant.listeners;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mogador.mineassistant.managers.HomeEntityToolManager;
+import com.mogador.mineassistant.managers.PowerableManager;
 
 public class HomeEntityToolListener implements Listener {
 
@@ -54,9 +56,26 @@ public class HomeEntityToolListener implements Listener {
         Block block = event.getClickedBlock();
         if (block == null || !Material.LEVER.equals(block.getType())) return;
 
-        // Cancel event if used item is the tool
+        // If used item is the tool
         if(event.getItem() != null && HomeEntityToolManager.getInstance().isTool(event.getItem())) {
+            // Cancel event
             event.setUseInteractedBlock(Result.DENY);
+
+            // Add / Remove the lever
+            String entity = HomeEntityToolManager.getInstance().getEntity(event.getItem());
+            Location loc = event.getClickedBlock().getLocation();
+            boolean success = false;
+            String message = "";
+
+            if(PowerableManager.getInstance().has(entity, loc)) {
+                success = PowerableManager.getInstance().remove(entity, loc);
+                message = String.format("[%s] - Desynchronisation ", plugin.getName());
+            } else {
+                success = PowerableManager.getInstance().add(entity, loc);
+                message = String.format("[%s] - Synchronisation ", plugin.getName());
+            }
+
+            event.getPlayer().sendMessage(message.concat(success ? "succeded" : "failed"));
         }
     }
 }
