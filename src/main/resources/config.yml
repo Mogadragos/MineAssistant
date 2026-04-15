@@ -11,3 +11,4 @@ mqtt:
 homeassistant:
   on: "on"
   off: "off"
+  
