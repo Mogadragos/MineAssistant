@@ -16,7 +16,7 @@ import com.mogador.mineassistant.constants.JsonConstants;
 import com.mogador.mineassistant.data.LogData;
 import com.mogador.mineassistant.data.HomeEntityChangeData;
 import com.mogador.mineassistant.events.HomeEntityStatusChangeEvent;
-import com.mogador.mineassistant.utils.JsonUtils;
+import com.mogador.mineassistant.managers.JsonManager;
 import com.mogador.mineassistant.utils.PlayerMessageUtils;
 
 public class HomeEntityStatusChangeCallback implements MqttCallback {
@@ -36,7 +36,7 @@ public class HomeEntityStatusChangeCallback implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         byte[] payload = message.getPayload();
         try {
-            HomeEntityChangeData data = JsonUtils.fromJson(new String(payload, StandardCharsets.UTF_8), HomeEntityChangeData.class);
+            HomeEntityChangeData data = JsonManager.getInstance().fromJson(new String(payload, StandardCharsets.UTF_8), HomeEntityChangeData.class);
             if(!JsonConstants.SOURCE_MINECRAFT.equals(data.getSource())) {
                 plugin.getLogger().info("Message received");
 
