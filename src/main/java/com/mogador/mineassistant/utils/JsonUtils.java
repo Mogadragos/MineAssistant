@@ -2,7 +2,7 @@ package com.mogador.mineassistant.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mogador.mineassistant.data.HomeEntityStatusDeserializer;
+import com.mogador.mineassistant.data.HomeEntityStatusAdapter;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 
 public class JsonUtils {
@@ -19,7 +19,7 @@ public class JsonUtils {
 
     private static Gson createGson() {
         GsonBuilder builder = new GsonBuilder(); 
-        builder.registerTypeAdapter(HomeEntityStatus.class, new HomeEntityStatusDeserializer()); 
+        builder.registerTypeAdapter(HomeEntityStatus.class, new HomeEntityStatusAdapter()); 
         Gson gson = builder.create(); 
         return gson;
     }
