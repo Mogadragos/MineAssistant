@@ -7,6 +7,7 @@ import com.mogador.mineassistant.listeners.StatusChangeListener;
 import com.mogador.mineassistant.listeners.SyncBreakListener;
 import com.mogador.mineassistant.managers.PowerableManager;
 import com.mogador.mineassistant.managers.HomeEntityToolManager;
+import com.mogador.mineassistant.managers.JsonManager;
 import com.mogador.mineassistant.managers.MqttManager;
 import com.mogador.mineassistant.managers.PersistenceManager;
 
@@ -21,6 +22,7 @@ public class MineAssistant extends JavaPlugin {
         // Initialize managers
         PersistenceManager.getInstance().initialize(this, "powerable.yml");
         PowerableManager.getInstance().initialize(this);
+        JsonManager.getInstance().initialize(this);
         MqttManager.getInstance().initialize(this);
         HomeEntityToolManager.getInstance().initialize(this);
         

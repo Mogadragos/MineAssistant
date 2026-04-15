@@ -4,13 +4,14 @@ import org.bukkit.entity.Player;
 
 import com.mogador.mineassistant.data.HomeEntityChangeData;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
+import com.mogador.mineassistant.managers.JsonManager;
 import com.mogador.mineassistant.managers.MqttManager;
 
 public class PublishingUtils {
 
     public static String prepareLightPayload(String entity, HomeEntityStatus status) {
         HomeEntityChangeData data = new HomeEntityChangeData(entity, status);
-        return JsonUtils.toJson(data);
+        return JsonManager.getInstance().toJson(data);
     }
 
     public static void publishLightChange(String entity, HomeEntityStatus status, Player player) {

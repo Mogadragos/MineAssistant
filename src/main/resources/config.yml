@@ -7,3 +7,7 @@ mqtt:
   connect_timeout: 30        # seconds
   automatic_reconnect: true
   clean_session: true
+
+homeassistant:
+  on: "on"
+  off: "off"

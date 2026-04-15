@@ -6,10 +6,17 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.mogador.mineassistant.constants.JsonConstants;
 import com.mogador.mineassistant.enums.HomeEntityStatus;
 
 public class HomeEntityStatusAdapter extends TypeAdapter<HomeEntityStatus> {
+
+    String onValue;
+    String offValue;
+
+    public HomeEntityStatusAdapter(String onValue, String offValue) {
+        this.onValue = onValue;
+        this.offValue = offValue;
+    }
 
     @Override
     public HomeEntityStatus read(JsonReader in) throws IOException {
@@ -18,12 +25,12 @@ public class HomeEntityStatusAdapter extends TypeAdapter<HomeEntityStatus> {
             return HomeEntityStatus.OFF;
         }
 
-        return JsonConstants.ON.equals(in.nextString()) ? HomeEntityStatus.ON : HomeEntityStatus.OFF;
+        return onValue.equals(in.nextString()) ? HomeEntityStatus.ON : HomeEntityStatus.OFF;
     }
 
     @Override
     public void write(JsonWriter out, HomeEntityStatus value) throws IOException {
-        out.value(HomeEntityStatus.ON.equals(value) ? JsonConstants.ON : JsonConstants.OFF);
+        out.value(HomeEntityStatus.ON.equals(value) ? onValue : offValue);
     }
     
 }
